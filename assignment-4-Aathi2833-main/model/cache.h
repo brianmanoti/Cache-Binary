@@ -99,4 +99,7 @@ void cacheSetUp(Cache *cache, char *name);
 void deallocate(Cache *cache);
 
 void printSummary(const Cache *cache);
+
+// Function declaration for find_block_index
+int find_block_index(unsigned long long tag, unsigned long long set, const Cache *cache);
 #endif // CACHE_H
