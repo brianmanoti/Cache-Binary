@@ -24,16 +24,10 @@ void validate_2level(const Cache *L1, const Cache *L2) {
 // address is in the cache.
 void runTrace(char *traceFile, Cache *L1, Cache *L2) {
     FILE *input = fopen(traceFile, "r");
-    if (input == NULL) {
-        fprintf(stderr, "Error: Cannot open trace file %s\n", traceFile);
-        exit(EXIT_FAILURE);
-    }
-
+    int size;
     char operation;
     unsigned long long address;
-    int size;
     result r_L1, r_L2;
-
     while (fscanf(input, " %c %llx,%d", &operation, &address, &size) == 3) {
         printf("\n%c %llx,", operation, address);
 
@@ -41,29 +35,44 @@ void runTrace(char *traceFile, Cache *L1, Cache *L2) {
             continue;
         }
 
-        // Access L1 cache
-        r_L1 = operateCache(address, L1);
+        // Determine index of the block within L2 cache
+        unsigned long long tag = cache_tag(address, L2);
+        unsigned long long set = cache_set(address, L2);
+        int index = find_block_index(tag, set, L2);
 
-        if (r_L1.status != CACHE_HIT) {
-            // L1 miss or eviction, access L2 cache
-            r_L2 = operateCache(address, L2);
+        // Evict block from L2 cache
+        evict_cache(address, index, L2);
 
-            // Handle L2 cache miss/eviction accordingly
-            if (r_L2.status != CACHE_HIT) {
-                // L2 miss, insert into L1 directly
+        // Operate L1 cache
+        if (!probe_cache(address, L1)) {
+            if (avail_cache(address, L1)) {
                 allocate_cache(address, L1);
-
-                // May cause eviction in L1, insert into L2
-                if (r_L1.status == CACHE_EVICT)
-                    allocate_cache(r_L1.insert_block, L2);
             } else {
-                // L2 hit, move block from L2 to L1
+                int victim_index = victim_cache(address, L1);
+                evict_cache(address, victim_index, L1);
                 allocate_cache(address, L1);
-                evict_cache(address, L2);
             }
         }
-    }
 
+        // Operate L2 cache
+        if (!probe_cache(address, L2)) {
+            if (avail_cache(address, L2)) {
+                allocate_cache(address, L2);
+            } else {
+                int victim_index = victim_cache(address, L2);
+                evict_cache(address, victim_index, L2);
+                allocate_cache(address, L2);
+            }
+        }
+
+        // Update hit count for L1 cache if operation is 'M'
+        if (operation == 'M') {
+            L1->hit_count++;
+        }
+
+        // Validate 2-level cache consistency
+        validate_2level(L1, L2);
+    }
     fclose(input);
 }
 

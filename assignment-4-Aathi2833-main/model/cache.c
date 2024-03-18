@@ -109,7 +109,7 @@ unsigned long long victim_cache(const unsigned long long address, Cache *cache) 
 }
 
 // Set can be determined by the address. Way is determined by policy and set by the operate cache. 
-void evict_cache(const unsigned long long address, int way, Cache *cache) {
+void evict_cache(const unsigned long long address, int index, Cache *cache) {
     unsigned long long set_index = cache_set(address, cache);
     cache->sets[set_index].lines[way].valid = 0;
 }
