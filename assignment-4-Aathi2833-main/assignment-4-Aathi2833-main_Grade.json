@@ -1,0 +1,35 @@
+{
+  "test1": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.test11"
+  },
+  "test2": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.test21"
+  },
+  "test3": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.test31"
+  },
+  "test4": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.test41"
+  },
+  "2lvlt1": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.2lvlt11"
+  },
+  "2lvlt2": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.2lvlt21"
+  },
+  "2lvlt3": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.2lvlt31"
+  },
+  "2lvlt4": {
+    "mark": 0,
+    "comment": "Program exited with return code. Either your output does not match the reference output. Check the log to see if you program has any errors. Also see word-count/out/input.txt and compare against your output. Ensure you are using the prints match exactly as specified. Check hints section on assignment page.2lvlt41"
+  },
+  "userid": "GithubID:assignment-4-Aathi2833-main"
+}
