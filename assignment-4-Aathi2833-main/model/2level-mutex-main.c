@@ -23,71 +23,48 @@ void validate_2level(const Cache *L1, const Cache *L2) {
 // get the input from the file and call operateCache function to see if the
 // address is in the cache.
 void runTrace(char *traceFile, Cache *L1, Cache *L2) {
-  FILE *input = fopen(traceFile, "r");
-  int size;
-  char operation;
-  unsigned long long address;
-  result r_L1, r_L2;
-  while (fscanf(input, " %c %llx,%d", &operation, &address, &size) == 3) {
-    printf("\n%c %llx,", operation, address);
-
-    if (operation != 'M' && operation != 'L' && operation != 'S') {
-      continue;
+    FILE *input = fopen(traceFile, "r");
+    if (input == NULL) {
+        fprintf(stderr, "Error: Cannot open trace file %s\n", traceFile);
+        exit(EXIT_FAILURE);
     }
 
-    // probe_L1 = True, probe_L2 = True. Not possible. Violates exclusive
-    // probe_L1 = True, probe_L2 = False. Hit in L1
-    // probe_L1 = False, probe_L2 = True. Hit in L2. Evict from L2 and insert
-    // L1. May evict something from L1 and cause insertion in L2. 
-    // probe_L1 = False, probe_L2 = False. Miss in both. Insert in L1. May evict something from L1 and cause insertion in L2.
+    char operation;
+    unsigned long long address;
+    int size;
+    result r_L1, r_L2;
 
+    while (fscanf(input, " %c %llx,%d", &operation, &address, &size) == 3) {
+        printf("\n%c %llx,", operation, address);
 
-    // TODO: Operate L1 and L2 cache to implement
-    // 2-level inclusive cache model
-    /*
-   Access   L1 Hit
-      │      ▲
-      │      │
-  ┌───▼──────┴───┐
-  │              │
-  │   L1 Cache   │
-  │              │
-  └───┬──────▲───┘
-      │      │
-      │      │
-L1 Miss      │L2 Hit (move from L2 to L1)
-(Bring       |
-into)        │
-  L1      ┌──▼──────┴───┐
-     |    │             │
-     |    │  L2 Cache   │
-     |    |             │
-     |    └────────┬────┘
-     |      │
-     |      │L2 miss (put into L1 directly)
-     ------ ▼
- */
-    //     // Consider evictions in L1 and L2
-/**
-+------------------------+---------------------------------+
-|                        | Steps                           |
-+------------------------+---------------------------------+
-| Case 1: L1 hit         | .......                         |
-+------------------------+---------------------------------+
-| Case 2: L1 Miss, L2 Hit| Insert block L1, Remove from L2.|                    
-+--------------------------+-------------------------------+
-| Case 3: L1 Miss, L2 Miss | Insert block in L1. Bypass L2 | 
-| If another block is evicted from L1, insert it in L2.    |
-+--------------------------+-------------------------------+
-     *
-     */
+        if (operation != 'M' && operation != 'L' && operation != 'S') {
+            continue;
+        }
 
-    if (operation == 'M') {
-      L1->hit_count++;
+        // Access L1 cache
+        r_L1 = operateCache(address, L1);
+
+        if (r_L1.status != CACHE_HIT) {
+            // L1 miss or eviction, access L2 cache
+            r_L2 = operateCache(address, L2);
+
+            // Handle L2 cache miss/eviction accordingly
+            if (r_L2.status != CACHE_HIT) {
+                // L2 miss, insert into L1 directly
+                allocate_cache(address, L1);
+
+                // May cause eviction in L1, insert into L2
+                if (r_L1.status == CACHE_EVICT)
+                    allocate_cache(r_L1.insert_block, L2);
+            } else {
+                // L2 hit, move block from L2 to L1
+                allocate_cache(address, L1);
+                evict_cache(address, L2);
+            }
+        }
     }
-    validate_2level(L1, L2);
-  }
-  fclose(input);
+
+    fclose(input);
 }
 
 int main(int argc, char *argv[]) {
