@@ -23,57 +23,56 @@ void validate_2level(const Cache *L1, const Cache *L2) {
 // get the input from the file and call operateCache function to see if the
 // address is in the cache.
 void runTrace(char *traceFile, Cache *L1, Cache *L2) {
-    FILE *input = fopen(traceFile, "r");
-    int size;
-    char operation;
-    unsigned long long address;
-    result r_L1, r_L2;
-    while (fscanf(input, " %c %llx,%d", &operation, &address, &size) == 3) {
-        printf("\n%c %llx,", operation, address);
+  FILE *input = fopen(traceFile, "r");
+  int size;
+  char operation;
+  unsigned long long address;
+  while (fscanf(input, " %c %llx,%d", &operation, &address, &size) == 3) {
+    printf("\n%c %llx,", operation, address);
 
-        if (operation != 'M' && operation != 'L' && operation != 'S') {
-            continue;
-        }
-
-        // Determine index of the block within L2 cache
-        unsigned long long tag = cache_tag(address, L2);
-        unsigned long long set = cache_set(address, L2);
-        int index = find_block_index(tag, set, L2);
-
-        // Evict block from L2 cache
-        evict_cache(address, index, L2);
-
-        // Operate L1 cache
-        if (!probe_cache(address, L1)) {
-            if (avail_cache(address, L1)) {
-                allocate_cache(address, L1);
-            } else {
-                int victim_index = victim_cache(address, L1);
-                evict_cache(address, victim_index, L1);
-                allocate_cache(address, L1);
-            }
-        }
-
-        // Operate L2 cache
-        if (!probe_cache(address, L2)) {
-            if (avail_cache(address, L2)) {
-                allocate_cache(address, L2);
-            } else {
-                int victim_index = victim_cache(address, L2);
-                evict_cache(address, victim_index, L2);
-                allocate_cache(address, L2);
-            }
-        }
-
-        // Update hit count for L1 cache if operation is 'M'
-        if (operation == 'M') {
-            L1->hit_count++;
-        }
-
-        // Validate 2-level cache consistency
-        validate_2level(L1, L2);
+    if (operation != 'M' && operation != 'L' && operation != 'S') {
+      continue;
     }
-    fclose(input);
+
+    // Determine index of the block within L2 cache
+    unsigned long long tag = cache_tag(address, L2);
+    unsigned long long set = cache_set(address, L2);
+    int index = find_block_index(tag, set, L2);
+
+    // Evict block from L2 cache
+    evict_cache(address, index, L2);
+
+    // Operate L1 cache
+    if (!probe_cache(address, L1)) {
+      if (avail_cache(address, L1)) {
+        allocate_cache(address, L1);
+      } else {
+        int victim_index = victim_cache(address, L1);
+        evict_cache(address, victim_index, L1);
+        allocate_cache(address, L1);
+      }
+    }
+
+    // Operate L2 cache
+    if (!probe_cache(address, L2)) {
+      if (avail_cache(address, L2)) {
+        allocate_cache(address, L2);
+      } else {
+        int victim_index = victim_cache(address, L2);
+        evict_cache(address, victim_index, L2);
+        allocate_cache(address, L2);
+      }
+    }
+
+    // Update hit count for L1 cache if operation is 'M'
+    if (operation == 'M') {
+      L1->hit_count++;
+    }
+
+    // Validate 2-level cache consistency
+    validate_2level(L1, L2);
+  }
+  fclose(input);
 }
 
 int main(int argc, char *argv[]) {
