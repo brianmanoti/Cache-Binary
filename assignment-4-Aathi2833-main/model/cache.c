@@ -119,7 +119,22 @@ void evict_cache(const unsigned long long address, int way, Cache *cache) {
 // If not found don't remove it. Useful when implementing 2-level policies. 
 // and triggering evictions from other caches. 
 void flush_cache(const unsigned long long block_address, Cache *cache) {
-  return;
+    unsigned long long set_index;
+    unsigned long long tag;
+    
+    // Iterate over all sets to find the block address
+    for (int i = 0; i < (1 << cache->setBits); i++) {
+        set_index = i;
+        for (int j = 0; j < cache->linesPerSet; j++) {
+            tag = cache->sets[set_index].lines[j].tag;
+            unsigned long long address = (tag << (cache->setBits + cache->blockBits)) | (set_index << cache->blockBits);
+            if (address == block_address) {
+                // Found the block address, invalidate it
+                cache->sets[set_index].lines[j].valid = 0;
+                return;
+            }
+        }
+    }
 }
 // checks if the address is in the cache, if not and if the cache is full
 // evicts an address
