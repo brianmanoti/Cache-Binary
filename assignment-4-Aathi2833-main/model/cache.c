@@ -22,9 +22,9 @@ void print_result(result r) {
 
 // HELPER FUNCTIONS USEFUL FOR IMPLEMENTING THE CACHE
 // Convert address to block address. 0s out the bottom block bits.
-unsigned long long address_to_block(const unsigned long long address,
-                                const Cache *cache) {
-                                  unsigned long long block_mask = ((unsigned long long)1 << cache->block_bits) - 1;return address & ~block_mask;                         
+unsigned long long address_to_block(const unsigned long long address, const Cache *cache) {
+    unsigned long long block_mask = ((unsigned long long)1 << cache->blockBits) - 1;
+    return address & ~block_mask;
 }
 
 // Access the cache after successful probing.

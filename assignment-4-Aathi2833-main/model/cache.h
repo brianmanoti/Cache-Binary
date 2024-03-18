@@ -69,7 +69,7 @@ void access_cache(const unsigned long long address, const Cache *cache);
 // If so, return true, else return false.
 bool probe_cache(const unsigned long long address, const Cache *cache);
 // Find entry in cache and insert entry for address.
-void allocate_cache(const unsigned long long address, const Cache *cache);
+void allocate_cache(const unsigned long long address, Cache *cache);
 
 
 bool avail_cache(const unsigned long long address, const Cache *cache);
