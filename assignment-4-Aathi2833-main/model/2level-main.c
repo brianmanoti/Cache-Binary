@@ -23,6 +23,7 @@ void validate_2level(const Cache *L1, const Cache *L2) {
 }
 // get the input from the file and call operateCache function to see if the
 // address is in the cache.
+
 void runTrace(char *traceFile, Cache *L1, Cache *L2) {
   FILE *input = fopen(traceFile, "r");
   int size;
@@ -38,28 +39,49 @@ void runTrace(char *traceFile, Cache *L1, Cache *L2) {
 
     // TODO: Operate L1 and L2 cache to implement
     // 2-level inclusive cache model
-    /*
-   Access   L1 Hit
-      │      ▲
-      │      │
-  ┌───▼──────┴───┐
-  │              │
-  │   L1 Cache   │
-  │              │
-  └───┬──────▲───┘
-      │      │
-      │      │
-L1 Miss      │L2 Hit
-      │      │
-   ┌──▼──────┴───┐
-   │             │
-   │  L2 Cache   │
-   |             │
-   └────────┬────┘
-            │
-            │L2 miss
-            ▼
- */
+    void runTrace(char *traceFile, Cache *L1, Cache *L2) {
+  FILE *input = fopen(traceFile, "r");
+  int size;
+  char operation;
+  unsigned long long address;
+  result r_L1, r_L2;
+  
+  while (fscanf(input, " %c %llx,%d", &operation, &address, &size) == 3) {
+    printf("\n%c %llx,", operation, address);
+
+    if (operation != 'M' && operation != 'L' && operation != 'S') {
+      continue;
+    }
+
+    // Access L1 Cache
+    r_L1 = operateCache(L1, address);
+    
+    // L1 Hit
+    if (r_L1.hit) {
+      printf(" L1 Hit");
+    } else {
+      printf(" L1 Miss");
+      
+      // Access L2 Cache
+      r_L2 = operateCache(L2, address);
+      
+      // L2 Hit
+      if (r_L2.hit) {
+        printf(" L2 Hit");
+        
+        // Update L1 with L2 data (inclusive)
+        updateCache(L1, address, r_L2.data);
+      } else {
+        printf(" L2 Miss");
+        
+        // Update both L1 and L2 with new data
+        updateCache(L1, address, NULL); // Update L1 with empty data
+        updateCache(L2, address, NULL); // Update L2 with empty data
+      }
+    }
+  }
+  fclose(input);
+}
     // Operate L1 cache first.
     // If miss, operate L2 cache
     // Consider evictions in L1 and L2. What would happen if block evicted from
